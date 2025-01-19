@@ -15,6 +15,11 @@ const userSchema = new mongoose.Schema({
     unique: true,
     trim: true,
   },
+  role: {
+    type: String,
+    required: true,
+    default: "user",
+  },
   password: {
     type: String,
     required: true,
@@ -40,6 +45,7 @@ userSchema.methods.generateJWT = function () {
   return Jwt.sign(
     {
       userId: this._id,
+      role: this.role,
     },
     process.env.JSON_SECRET,
     {

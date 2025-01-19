@@ -8,6 +8,7 @@ import React, {
 import axios from "axios";
 
 interface AuthContextType {
+  role: boolean;
   isAuthenticated: boolean;
   login: (token: string) => void;
   logout: () => void;
@@ -21,7 +22,8 @@ interface AuthProviderProps {
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [isLoading, setIsLoading] = useState(true); // New loading state
+  const [role, setRole] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -42,6 +44,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           }
         );
         console.log("API Response:", response.data);
+        setRole(response.data.role);
         setIsAuthenticated(response.data.success);
       } catch (error) {
         console.error("Error checking authentication:", error);
@@ -65,9 +68,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, login, logout }}>
+    <AuthContext.Provider value={{ role, isAuthenticated, login, logout }}>
       {!isLoading ? children : <div>Loading...</div>}{" "}
-      {/* Show loading indicator */}
     </AuthContext.Provider>
   );
 };

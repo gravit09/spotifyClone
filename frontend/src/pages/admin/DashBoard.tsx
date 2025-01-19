@@ -5,14 +5,13 @@ import { useAuth } from "../../context/AuthContext";
 
 const AdminDashboard: React.FC = () => {
   const navigate = useNavigate();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, role } = useAuth();
 
   useEffect(() => {
-    if (!isAuthenticated) {
+    if (!isAuthenticated || !role) {
       navigate("/");
-      return;
     }
-  }, []);
+  }, [isAuthenticated, role, navigate]);
 
   return (
     <div className="min-h-screen bg-black text-white p-8">

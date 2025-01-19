@@ -7,12 +7,12 @@ const authenticateJWT = async (req, res, next) => {
   }
   const token = authHeader.split(" ")[1];
   if (!token) {
-    console.log("here");
     return res.status(403).json({ message: "Access denied, token missing!" });
   }
   try {
     const decoded = jwt.verify(token, process.env.JSON_SECRET);
     req.userId = decoded.userId;
+    req.role = decoded.role;
     next();
   } catch (error) {
     console.error("Token verification failed:", error.message);

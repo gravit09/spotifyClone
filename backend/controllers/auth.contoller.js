@@ -73,16 +73,27 @@ const loginUserHandler = async (req, res) => {
 
   return res.status(200).cookie("AccessToken", token, options).json({
     success: true,
+    role: checkUser.role,
     message: "User logged in",
     token,
   });
 };
 
 const isAllowed = async (req, res) => {
-  return res.status(200).json({
-    message: "valid",
-    success: true,
-  });
+  const { role } = req;
+  if (role !== "admin") {
+    return res.status(200).json({
+      message: "valid",
+      role: false,
+      success: true,
+    });
+  } else {
+    return res.status(200).json({
+      message: "valid",
+      role: true,
+      success: true,
+    });
+  }
 };
 
 export { userSignUpHandler, loginUserHandler, isAllowed };

@@ -6,13 +6,15 @@ import { LoginCredentials } from "../../types/auth";
 
 const Login: React.FC = () => {
   const navigate = useNavigate();
-  const { login, isAuthenticated } = useAuth();
+  const { login, isAuthenticated, role } = useAuth();
 
   useEffect(() => {
-    if (isAuthenticated) {
+    if (isAuthenticated && role) {
       navigate("/dashboard");
+    } else if (isAuthenticated && !role) {
+      navigate("/home");
     }
-  }, []);
+  }, [isAuthenticated, role]);
 
   const [credentials, setCredentials] = useState<LoginCredentials>({
     email: "",
@@ -29,9 +31,12 @@ const Login: React.FC = () => {
       );
       if (response.data.success) {
         const token = response.data.token;
-        console.log(token);
         login(token);
-        navigate("/dashboard");
+        if (response.data.role === "admin") {
+          navigate("/dashboard");
+        } else {
+          navigate("/home");
+        }
       } else {
         setError("Invalid Credentials");
         console.error("Login failed");
