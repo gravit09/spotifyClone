@@ -1,11 +1,19 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { useAuth } from "../../context/AuthContext";
 import { SignupCredentials } from "../../types/auth";
 
 const Signup: React.FC = () => {
   const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate("/dashboard");
+    }
+  }, []);
   const [credentials, setCredentials] = useState<SignupCredentials>({
+    username: "",
     email: "",
     password: "",
     confirmPassword: "",
@@ -20,7 +28,7 @@ const Signup: React.FC = () => {
     }
     try {
       await axios.post("http://localhost:3000/api/auth/signup", credentials);
-      navigate("/login");
+      navigate("/");
     } catch (err) {
       setError("Failed to create account");
     }
@@ -41,6 +49,23 @@ const Signup: React.FC = () => {
         )}
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <div className="rounded-md shadow-sm space-y-4">
+            <div>
+              <label htmlFor="username" className="sr-only">
+                UserName
+              </label>
+              <input
+                id="username"
+                name="username"
+                type="username"
+                required
+                className="appearance-none rounded-lg relative block w-full px-3 py-2 border border-gray-700 bg-zinc-800 text-white placeholder-gray-400 focus:outline-none focus:ring-green-500 focus:border-green-500"
+                placeholder="UserName"
+                value={credentials.username}
+                onChange={(e) =>
+                  setCredentials({ ...credentials, username: e.target.value })
+                }
+              />
+            </div>
             <div>
               <label htmlFor="email" className="sr-only">
                 Email address

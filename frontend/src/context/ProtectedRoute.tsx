@@ -1,4 +1,4 @@
-import React, { ReactNode, useEffect, useState } from "react";
+import React, { ReactNode } from "react";
 import { Navigate, Outlet } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
@@ -12,18 +12,6 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   children,
 }) => {
   const { isAuthenticated } = useAuth();
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    setIsLoading(!token); // Avoid loading if no token is available
-  }, []);
-
-  console.log("Auth state:", isAuthenticated);
-
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
 
   if (!isAuthenticated) {
     return <Navigate to={redirectPath} replace />;

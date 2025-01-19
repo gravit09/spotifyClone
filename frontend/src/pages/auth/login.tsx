@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useAuth } from "../../context/AuthContext";
@@ -6,7 +6,14 @@ import { LoginCredentials } from "../../types/auth";
 
 const Login: React.FC = () => {
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { login, isAuthenticated } = useAuth();
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate("/dashboard");
+    }
+  }, []);
+
   const [credentials, setCredentials] = useState<LoginCredentials>({
     email: "",
     password: "",
@@ -25,9 +32,8 @@ const Login: React.FC = () => {
         console.log(token);
         login(token);
         navigate("/dashboard");
-        alert("Logged in successfully!");
       } else {
-        alert("Invalid Credentials");
+        setError("Invalid Credentials");
         console.error("Login failed");
       }
     } catch (err) {
