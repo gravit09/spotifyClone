@@ -1,46 +1,79 @@
-import React, { createContext, useContext, useState, useEffect } from "react";
-import { AuthState, User } from "../types/auth";
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  ReactNode,
+} from "react";
+import axios from "axios";
 
 interface AuthContextType {
-  auth: AuthState;
-  login: (token: string, user: User) => void;
+  isAuthenticated: boolean;
+  login: (token: string) => void;
   logout: () => void;
 }
 
-const AuthContext = createContext<AuthContextType | null>(null);
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
-  children,
-}) => {
-  const [auth, setAuth] = useState<AuthState>({
-    user: null,
-    token: localStorage.getItem("token"),
-  });
+interface AuthProviderProps {
+  children: ReactNode;
+}
+
+export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isLoading, setIsLoading] = useState(true); // New loading state
 
   useEffect(() => {
-    if (auth.token) {
-      localStorage.setItem("token", auth.token);
-    } else {
-      localStorage.removeItem("token");
-    }
-  }, [auth.token]);
+    const checkAuth = async () => {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        console.log("No token found");
+        setIsAuthenticated(false);
+        setIsLoading(false); // Update loading state
+        return;
+      }
+      try {
+        const response = await axios.get(
+          `http://localhost:3000/api/auth/protected`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        console.log("API Response:", response.data);
+        setIsAuthenticated(response.data.success);
+      } catch (error) {
+        console.error("Error checking authentication:", error);
+        setIsAuthenticated(false);
+      } finally {
+        setIsLoading(false); // Loading completed
+      }
+    };
 
-  const login = (token: string, user: User) => {
-    setAuth({ user, token });
+    checkAuth();
+  }, []);
+
+  const login = (token: string) => {
+    localStorage.setItem("token", token);
+    setIsAuthenticated(true);
   };
 
   const logout = () => {
-    setAuth({ user: null, token: null });
+    localStorage.removeItem("token");
+    setIsAuthenticated(false);
   };
 
   return (
-    <AuthContext.Provider value={{ auth, login, logout }}>
-      {children}
+    <AuthContext.Provider value={{ isAuthenticated, login, logout }}>
+      {!isLoading ? children : <div>Loading...</div>}{" "}
+      {/* Show loading indicator */}
     </AuthContext.Provider>
   );
 };
 
-export const useAuth = () => {
+// Custom hook to use the AuthContext
+export const useAuth = (): AuthContextType => {
   const context = useContext(AuthContext);
   if (!context) {
     throw new Error("useAuth must be used within an AuthProvider");

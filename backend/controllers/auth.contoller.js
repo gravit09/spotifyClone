@@ -78,4 +78,11 @@ const loginUserHandler = async (req, res) => {
   });
 };
 
-export { userSignUpHandler, loginUserHandler };
+const isAllowed = async (req, res) => {
+  return res.status(200).json({
+    message: "valid",
+    success: true,
+  });
+};
+
+export { userSignUpHandler, loginUserHandler, isAllowed };

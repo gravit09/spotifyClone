@@ -2,6 +2,7 @@ import { Router } from "express";
 import {
   loginUserHandler,
   userSignUpHandler,
+  isAllowed,
 } from "../controllers/auth.contoller.js";
 import { authenticateJWT } from "../middlewares/isAuthenticated.js";
 
@@ -9,5 +10,6 @@ const router = Router();
 
 router.route("/login").post(loginUserHandler);
 router.route("/signup").post(userSignUpHandler);
+router.route("/protected").get(authenticateJWT, isAllowed);
 
 export default router;

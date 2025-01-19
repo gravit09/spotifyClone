@@ -20,8 +20,16 @@ const Login: React.FC = () => {
         "http://localhost:3000/api/auth/login",
         credentials
       );
-      login(response.data.token, response.data.user);
-      navigate("/");
+      if (response.data.success) {
+        const token = response.data.token;
+        console.log(token);
+        login(token);
+        navigate("/dashboard");
+        alert("Logged in successfully!");
+      } else {
+        alert("Invalid Credentials");
+        console.error("Login failed");
+      }
     } catch (err) {
       setError("Invalid credentials");
     }

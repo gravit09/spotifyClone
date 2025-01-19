@@ -7,6 +7,7 @@ const authenticateJWT = async (req, res, next) => {
   }
   const token = authHeader.split(" ")[1];
   if (!token) {
+    console.log("here");
     return res.status(403).json({ message: "Access denied, token missing!" });
   }
   try {
