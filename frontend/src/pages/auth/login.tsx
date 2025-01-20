@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useAuth } from "../../context/AuthContext";
 import { LoginCredentials } from "../../types/auth";
@@ -31,8 +31,13 @@ const Login: React.FC = () => {
       );
       if (response.data.success) {
         const token = response.data.token;
-        login(token);
-        if (response.data.role === "admin") {
+        const role = response.data.role;
+        if (role == "admin") {
+          login(token, true);
+        } else {
+          login(token, false);
+        }
+        if (response.data.role == "admin") {
           navigate("/dashboard");
         } else {
           navigate("/home");
@@ -96,7 +101,12 @@ const Login: React.FC = () => {
               />
             </div>
           </div>
-
+          <p className="text-white">
+            Don't have an Account?{" "}
+            <Link to="/signup">
+              <span className="text-blue">Signup</span>
+            </Link>
+          </p>
           <div>
             <button
               type="submit"

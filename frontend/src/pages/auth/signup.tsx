@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import axios from "axios";
 import { useAuth } from "../../context/AuthContext";
 import { SignupCredentials } from "../../types/auth";
@@ -121,7 +121,12 @@ const Signup: React.FC = () => {
               />
             </div>
           </div>
-
+          <p className="text-white">
+            Already have an account?{" "}
+            <Link to="/">
+              <span className="text-blue">Login</span>
+            </Link>
+          </p>
           <div>
             <button
               type="submit"

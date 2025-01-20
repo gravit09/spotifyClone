@@ -8,9 +8,9 @@ import React, {
 import axios from "axios";
 
 interface AuthContextType {
-  role: boolean;
+  role: boolean | null;
   isAuthenticated: boolean;
-  login: (token: string) => void;
+  login: (token: string, role: boolean) => void;
   logout: () => void;
 }
 
@@ -22,7 +22,7 @@ interface AuthProviderProps {
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [role, setRole] = useState(false);
+  const [role, setRole] = useState<boolean | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -57,19 +57,21 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     checkAuth();
   }, []);
 
-  const login = (token: string) => {
+  const login = (token: string, role: boolean) => {
     localStorage.setItem("token", token);
+    setRole(role);
     setIsAuthenticated(true);
   };
 
   const logout = () => {
     localStorage.removeItem("token");
+    setRole(null);
     setIsAuthenticated(false);
   };
 
   return (
     <AuthContext.Provider value={{ role, isAuthenticated, login, logout }}>
-      {!isLoading ? children : <div>Loading...</div>}{" "}
+      {!isLoading ? children : <div>Loading...</div>}
     </AuthContext.Provider>
   );
 };
