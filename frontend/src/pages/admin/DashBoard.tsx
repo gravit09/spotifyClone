@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Users, Music, PlayCircle, Loader } from "lucide-react";
+import { Users, Music, PlayCircle } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 
 const AdminDashboard: React.FC = () => {
