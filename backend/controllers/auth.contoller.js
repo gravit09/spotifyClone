@@ -96,4 +96,16 @@ const isAllowed = async (req, res) => {
   }
 };
 
-export { userSignUpHandler, loginUserHandler, isAllowed };
+const adminMiddleWare = async (req, res, next) => {
+  const { role } = req;
+  if (role !== "admin") {
+    res.status(402).json({
+      message: "Unauthorised admin route access",
+    });
+    return;
+  } else {
+    next();
+  }
+};
+
+export { userSignUpHandler, loginUserHandler, isAllowed, adminMiddleWare };
