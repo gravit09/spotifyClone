@@ -8,9 +8,7 @@ import { deleteAlbum } from "../controllers/admin.controller.js";
 const router = Router();
 router.route("/upload").post(authenticateJWT, adminMiddleWare, uploadSong);
 router.route("/delete/:id").post(authenticateJWT, adminMiddleWare, deleteSong);
-router
-  .route("/uploadAlbum")
-  .post(authenticateJWT, adminMiddleWare, uploadAlbum);
-router.route(authenticateJWT, adminMiddleWare, deleteAlbum);
+router.route("/album").post(authenticateJWT, adminMiddleWare, uploadAlbum);
+router.route("/album/:id").post(authenticateJWT, adminMiddleWare, deleteAlbum);
 
 export default router;
