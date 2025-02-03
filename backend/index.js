@@ -17,10 +17,12 @@ import userRouter from "./routes/user.routes.js";
 import adminRouter from "./routes/admin.routes.js";
 import albumRouter from "./routes/album.routes.js";
 import songRouter from "./routes/song.routes.js";
+import statRouter from "./routes/stat.routes.js";
 app.use("/api/auth", userRouter);
 app.use("/api/admin", adminRouter);
 app.use("/api/album", albumRouter);
 app.use("/api/songs", songRouter);
+app.use("/api/stats", statRouter);
 
 app.use(
   fileUpload({

@@ -5,3 +5,5 @@ import { getAllStats } from "../controllers/stat.controller.js";
 const router = Router();
 
 router.route("/").get(authenticateJWT, isAllowed, getAllStats);
+
+export default router;
