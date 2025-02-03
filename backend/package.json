@@ -4,7 +4,9 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "seed:songs": "node seeds/song.js",
+    "seed:album": "node seeds/album.js"
   },
   "keywords": [],
   "author": "",

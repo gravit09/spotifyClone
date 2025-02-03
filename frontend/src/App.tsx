@@ -7,6 +7,7 @@ import Signup from "./pages/auth/signup";
 import Home from "./pages/user/home";
 import MainLayout from "./layout/MainLayout";
 import ChatPage from "./pages/chat/ChatPage";
+import AlbumPage from "./pages/album/AlbumPage";
 
 function App() {
   const router = createBrowserRouter([
@@ -18,6 +19,10 @@ function App() {
         {
           path: "/chat",
           element: <ChatPage />,
+        },
+        {
+          path: "/album",
+          element: <AlbumPage />,
         },
       ],
     },

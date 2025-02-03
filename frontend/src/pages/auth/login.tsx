@@ -12,7 +12,7 @@ const Login: React.FC = () => {
     if (isAuthenticated && role) {
       navigate("/dashboard");
     } else if (isAuthenticated && !role) {
-      navigate("/home");
+      navigate("/");
     }
   }, [isAuthenticated, role]);
 

@@ -1,20 +1,13 @@
-import { useEffect } from "react";
 import { useAuth } from "../../context/AuthContext";
 import { useNavigate, Link } from "react-router-dom";
 export default function Home() {
   const navigate = useNavigate();
-  const { isAuthenticated, logout, role } = useAuth();
-  useEffect(() => {
-    if (!isAuthenticated) {
-      navigate("/");
-    }
-  }, [isAuthenticated, navigate, role]);
-  console.log(role);
+  const { isAuthenticated, role, logout } = useAuth();
 
   return (
     <div className="min-h-screen bg-black text-white">
       <header className="flex items-center justify-between px-6 py-4 bg-gray-900">
-        <div className="text-2xl font-bold">Spotify Clone</div>
+        <div className="text-2xl font-bold">Spotify</div>
         <nav className="flex space-x-4">
           <a href="#" className="text-sm hover:text-green-500">
             Home
@@ -31,12 +24,21 @@ export default function Home() {
             </Link>
           )}
         </nav>
-        <button
-          onClick={() => logout()}
-          className="py-2 px-4 bg-green-500 text-sm rounded-full hover:bg-green-400"
-        >
-          Logout
-        </button>
+        {isAuthenticated ? (
+          <button
+            onClick={() => logout()}
+            className="py-2 px-4 bg-green-500 text-sm rounded-full hover:bg-green-400"
+          >
+            Logout
+          </button>
+        ) : (
+          <button
+            onClick={() => navigate("/login")}
+            className="py-2 px-4 bg-green-500 text-sm rounded-full hover:bg-green-400"
+          >
+            Login
+          </button>
+        )}
       </header>
 
       {/* Hero Section */}
