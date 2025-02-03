@@ -5,20 +5,29 @@ import { AuthProvider } from "./context/AuthContext";
 import Login from "./pages/auth/login";
 import Signup from "./pages/auth/signup";
 import Home from "./pages/user/home";
+import MainLayout from "./layout/MainLayout";
+import ChatPage from "./pages/chat/ChatPage";
 
 function App() {
   const router = createBrowserRouter([
     {
       path: "/",
+      element: <MainLayout />,
+      children: [
+        { path: "/", element: <Home /> },
+        {
+          path: "/chat",
+          element: <ChatPage />,
+        },
+      ],
+    },
+    {
+      path: "/login",
       element: <Login />,
     },
     {
       path: "/signup",
       element: <Signup />,
-    },
-    {
-      path: "/home",
-      element: <Home />,
     },
     {
       path: "/dashboard",
