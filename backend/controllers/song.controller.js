@@ -1,4 +1,4 @@
-import { Song } from "../models/song.model";
+import { Song } from "../models/song.model.js";
 
 export const getAllSongs = async (req, res) => {
   try {
@@ -22,8 +22,74 @@ export const getAllSongs = async (req, res) => {
 
 export const getFeaturedSongs = async (req, res) => {
   try {
-    const songs = await Song.aggregate();
-  } catch (err) {}
+    //will fetch 6 random songs
+    const songs = await Song.aggregate([
+      {
+        $sample: { size: 6 },
+      },
+      {
+        $project: {
+          _id: 1, //one represent the field should be included
+          title: 1,
+          artist: 1,
+          imageUrl: 1,
+          audioUrl: 1,
+        },
+      },
+    ]);
+    res.json(songs);
+  } catch (err) {
+    res.status(400).json({
+      message: "Something went wrong while fetching featured songs",
+    });
+  }
 };
-export const getTrendingSong = async (req, res) => {};
-export const getPickedSong = async (req, res) => {};
+
+export const getPickedSong = async (req, res) => {
+  try {
+    const songs = await Song.aggregate([
+      {
+        $sample: { size: 4 },
+      },
+      {
+        $project: {
+          _id: 1,
+          title: 1,
+          artist: 1,
+          imageUrl: 1,
+          audioUrl: 1,
+        },
+      },
+    ]);
+    res.json(songs);
+  } catch (err) {
+    res.status(400).json({
+      message: "Something went wrong while fetching picked songs",
+    });
+  }
+};
+
+export const getTrendingSong = async (req, res) => {
+  try {
+    //will fetch 6 random songs
+    const songs = await Song.aggregate([
+      {
+        $sample: { size: 4 },
+      },
+      {
+        $project: {
+          _id: 1,
+          title: 1,
+          artist: 1,
+          imageUrl: 1,
+          audioUrl: 1,
+        },
+      },
+    ]);
+    res.json(songs);
+  } catch (err) {
+    res.status(400).json({
+      message: "Something went wrong while fetching featured songs",
+    });
+  }
+};
