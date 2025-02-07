@@ -1,11 +1,16 @@
-import React, { useEffect } from "react";
+import { useAuth } from "@/context/AuthContext";
+import Header from "./components/Header";
 import { useNavigate } from "react-router-dom";
-import { Users, Music, PlayCircle } from "lucide-react";
-import { useAuth } from "../../context/AuthContext";
-
-const AdminDashboard: React.FC = () => {
+import DashboardStats from "./components/DashboardStats";
+import { Album, Music } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import SongsTabContent from "./components/SongsTabContent";
+import AlbumsTabContent from "./components/AlbumsTabContent";
+import { useEffect } from "react";
+import { useMusicStore } from "@/store/useMusicStore";
+const AdminPage = () => {
   const navigate = useNavigate();
-  const { isAuthenticated, role, logout } = useAuth();
+  const { isAuthenticated, role } = useAuth();
 
   useEffect(() => {
     if (!isAuthenticated || !role) {
@@ -13,60 +18,49 @@ const AdminDashboard: React.FC = () => {
     }
   }, [isAuthenticated, role, navigate]);
 
+  const { fetchAlbums, fetchSongs, fetchStats } = useMusicStore();
+
+  useEffect(() => {
+    fetchAlbums();
+    fetchSongs();
+    fetchStats();
+  }, [fetchAlbums, fetchSongs, fetchStats]);
+
   return (
-    <div className="min-h-screen bg-black text-white p-8">
-      <div className="max-w-7xl mx-auto">
-        <div className="flex items-center justify-between mb-8">
-          <h1 className="text-3xl font-bold">Admin Dashboard</h1>
-          <button
-            onClick={() => logout()}
-            className="group relative flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-full text-white bg-green-500 hover:bg-green-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+    <div
+      className="min-h-screen bg-gradient-to-b from-zinc-900 via-zinc-900
+   to-black text-zinc-100 p-8"
+    >
+      <Header />
+
+      <DashboardStats />
+
+      <Tabs defaultValue="songs" className="space-y-6">
+        <TabsList className="p-1 bg-zinc-800/50">
+          <TabsTrigger
+            value="songs"
+            className="data-[state=active]:bg-zinc-700"
           >
-            Logout
-          </button>
-        </div>
+            <Music className="mr-2 size-4" />
+            Songs
+          </TabsTrigger>
+          <TabsTrigger
+            value="albums"
+            className="data-[state=active]:bg-zinc-700"
+          >
+            <Album className="mr-2 size-4" />
+            Albums
+          </TabsTrigger>
+        </TabsList>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="bg-zinc-900 p-6 rounded-lg">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-gray-400">Total Users</p>
-                <p className="text-2xl font-bold">{0}</p>
-              </div>
-              <Users className="h-10 w-10 text-green-500" />
-            </div>
-          </div>
-
-          <div className="bg-zinc-900 p-6 rounded-lg">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-gray-400">Total Songs</p>
-                <p className="text-2xl font-bold">{0}</p>
-              </div>
-              <Music className="h-10 w-10 text-green-500" />
-            </div>
-          </div>
-
-          <div className="bg-zinc-900 p-6 rounded-lg">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-gray-400">Total Plays</p>
-                <p className="text-2xl font-bold">{0}</p>
-              </div>
-              <PlayCircle className="h-10 w-10 text-green-500" />
-            </div>
-          </div>
-        </div>
-
-        <div className="mt-8 bg-zinc-900 rounded-lg p-6">
-          <h2 className="text-xl font-bold mb-4">Recent Activity</h2>
-          <div className="bg-zinc-800 rounded-lg p-4">
-            <p className="text-gray-400">No recent activity to display</p>
-          </div>
-        </div>
-      </div>
+        <TabsContent value="songs">
+          <SongsTabContent />
+        </TabsContent>
+        <TabsContent value="albums">
+          <AlbumsTabContent />
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };
-
-export default AdminDashboard;
+export default AdminPage;

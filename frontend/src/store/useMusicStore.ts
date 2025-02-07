@@ -104,10 +104,14 @@ export const useMusicStore = create<MusicStore>((set) => ({
 
   fetchAlbums: async () => {
     set({ isLoading: true, error: null });
-
     try {
-      const response = await axiosInstance.get("/albums");
-      set({ albums: response.data });
+      const token = localStorage.getItem("token");
+      const response = await axiosInstance.get("/albums", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      set({ albums: response.data.allAlbums });
     } catch (error: any) {
       set({ error: error.response.data.message });
     } finally {

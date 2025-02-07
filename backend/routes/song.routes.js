@@ -7,7 +7,7 @@ import { getFeaturedSongs } from "../controllers/song.controller.js";
 import { getTrendingSong } from "../controllers/song.controller.js";
 import { getPickedSong } from "../controllers/song.controller.js";
 
-router.route("/").get(authenticateJWT, adminMiddleWare, getAllSongs);
+router.route("/").get(authenticateJWT, getAllSongs);
 router.route("/featured").get(getFeaturedSongs);
 router.route("/trending").get(getTrendingSong);
 router.route("/pickedForYou").get(getPickedSong);
