@@ -14,12 +14,8 @@ const LeftSidebar = () => {
     fetchAlbums();
   }, [fetchAlbums]);
 
-  console.log({ albums });
-
   return (
     <div className="h-full flex flex-col gap-2">
-      {/* Navigation menu */}
-
       <div className="rounded-lg bg-zinc-900 p-4">
         <div className="space-y-2">
           <Link

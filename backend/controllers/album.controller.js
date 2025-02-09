@@ -19,9 +19,7 @@ export const getAllAlbumById = async (req, res) => {
   try {
     const { id } = req.params;
     //to get all the songs from a particular album we use populate because we only have array of id
-    const album = await Album.findById({
-      id,
-    }).populate("songs");
+    const album = await Album.findById(id).populate("songs");
     if (!album) {
       return res.status(404).json({
         message: "No album with this id found",

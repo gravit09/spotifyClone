@@ -21,7 +21,7 @@ function App() {
           element: <ChatPage />,
         },
         {
-          path: "/album",
+          path: "/albums/:albumId",
           element: <AlbumPage />,
         },
       ],

@@ -165,13 +165,19 @@ const seedDatabase = async () => {
     const createdAlbums = await Album.insertMany(albums);
 
     // Update songs with their album references
+    // Update each album to contain song IDs
     for (let i = 0; i < createdAlbums.length; i++) {
       const album = createdAlbums[i];
       const albumSongs = albums[i].songs;
 
+      await Album.updateOne(
+        { _id: album._id },
+        { $set: { songs: albumSongs } }
+      );
+
       await Song.updateMany(
         { _id: { $in: albumSongs } },
-        { albumId: album._id }
+        { $set: { albumId: album._id } }
       );
     }
 

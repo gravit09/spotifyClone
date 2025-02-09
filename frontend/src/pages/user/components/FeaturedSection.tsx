@@ -6,7 +6,6 @@ const FeaturedSection = () => {
   const { isLoading, featuredSongs, error } = useMusicStore();
 
   if (isLoading) return <FeaturedGridSkeleton />;
-
   if (error) return <p className="text-red-500 mb-4 text-lg">{error}</p>;
 
   return (
