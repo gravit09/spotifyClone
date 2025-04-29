@@ -4,8 +4,23 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { useChatStore } from "@/stores/useChatStore";
 
 const UsersList = () => {
-  const { users, selectedUser, isLoading, setSelectedUser, onlineUsers } =
-    useChatStore();
+  const {
+    users,
+    selectedUser,
+    isLoading,
+    setSelectedUser,
+    onlineUsers,
+    userActivities,
+  } = useChatStore();
+
+  console.log("[UsersList] Users:", users);
+  console.log("[UsersList] Number of users:", users.length);
+  console.log("[UsersList] Online Users:", Array.from(onlineUsers));
+  console.log(
+    "[UsersList] User Activities:",
+    Array.from(userActivities.entries())
+  );
+  console.log("[UsersList] Selected User:", selectedUser);
 
   if (isLoading) {
     return (
@@ -38,35 +53,44 @@ const UsersList = () => {
       <div className="flex flex-col h-full">
         <ScrollArea className="h-[calc(100vh-280px)]">
           <div className="space-y-2 p-4">
-            {users.map((user) => (
-              <div
-                key={user._id}
-                onClick={() => setSelectedUser(user)}
-                className={`flex items-center justify-center lg:justify-start gap-3 p-3 
-									rounded-lg cursor-pointer transition-colors
-									${
+            {users.map((user) => {
+              const isOnline = onlineUsers.has(user.clerkId);
+              const activity = userActivities.get(user.clerkId);
+              console.log(
+                `[UsersList] User ${user.fullName} is ${
+                  isOnline ? "online" : "offline"
+                }`
+              );
+              return (
+                <div
+                  key={user.clerkId}
+                  onClick={() => setSelectedUser(user)}
+                  className={`flex items-center gap-2 p-2 rounded-lg cursor-pointer ${
                     selectedUser?.clerkId === user.clerkId
-                      ? "bg-zinc-800"
-                      : "hover:bg-zinc-800/50"
+                      ? "bg-gray-200"
+                      : "hover:bg-gray-100"
                   }`}
-              >
-                <div className="relative">
-                  <Avatar className="size-8 md:size-12">
-                    <AvatarImage src={user.imageUrl} />
-                    <AvatarFallback>{user.fullName?.[0] || "?"}</AvatarFallback>
-                  </Avatar>
-                  {/* online indicator */}
-                  <div
-                    className={`absolute bottom-0 right-0 h-3 w-3 rounded-full ring-2 ring-zinc-900
-											${onlineUsers?.has(user.clerkId) ? "bg-green-500" : "bg-zinc-500"}`}
-                  />
+                >
+                  <div className="relative">
+                    <Avatar>
+                      <AvatarImage src={user.imageUrl} />
+                      <AvatarFallback>{user.fullName[0]}</AvatarFallback>
+                    </Avatar>
+                    <div
+                      className={`absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-white ${
+                        isOnline ? "bg-green-500" : "bg-gray-400"
+                      }`}
+                    />
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="font-medium">{user.fullName}</span>
+                    <span className="text-sm text-gray-500">
+                      {isOnline ? "Online" : "Offline"}
+                    </span>
+                  </div>
                 </div>
-
-                <div className="flex-1 min-w-0 lg:block hidden">
-                  <span className="font-medium truncate">{user.fullName}</span>
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </ScrollArea>
       </div>
