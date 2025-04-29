@@ -7,6 +7,9 @@ interface PlayerStore {
   isPlaying: boolean;
   queue: Song[];
   currentIndex: number;
+  volume: number;
+  isShuffled: boolean;
+  repeatMode: "none" | "one" | "all";
 
   initializeQueue: (songs: Song[]) => void;
   playAlbum: (songs: Song[], startIndex?: number) => void;
@@ -14,6 +17,9 @@ interface PlayerStore {
   togglePlay: () => void;
   playNext: () => void;
   playPrevious: () => void;
+  setVolume: (volume: number) => void;
+  toggleShuffle: () => void;
+  toggleRepeat: () => void;
 }
 
 export const usePlayerStore = create<PlayerStore>((set, get) => ({
@@ -21,6 +27,9 @@ export const usePlayerStore = create<PlayerStore>((set, get) => ({
   isPlaying: false,
   queue: [],
   currentIndex: -1,
+  volume: 0.5,
+  isShuffled: false,
+  repeatMode: "none",
 
   initializeQueue: (songs: Song[]) => {
     set({
@@ -90,8 +99,24 @@ export const usePlayerStore = create<PlayerStore>((set, get) => ({
   },
 
   playNext: () => {
-    const { currentIndex, queue } = get();
+    const { currentIndex, queue, repeatMode } = get();
     const nextIndex = currentIndex + 1;
+
+    // Handle repeat modes
+    if (repeatMode === "one") {
+      const currentSong = get().currentSong;
+      if (currentSong) {
+        const socket = useChatStore.getState().socket;
+        if (socket.auth) {
+          socket.emit("update_activity", {
+            userId: socket.auth.userId,
+            activity: `Playing ${currentSong.title} by ${currentSong.artist}`,
+          });
+        }
+        set({ isPlaying: true });
+        return;
+      }
+    }
 
     // if there is a next song to play, let's play it
     if (nextIndex < queue.length) {
@@ -110,6 +135,21 @@ export const usePlayerStore = create<PlayerStore>((set, get) => ({
         currentIndex: nextIndex,
         isPlaying: true,
       });
+    } else if (repeatMode === "all") {
+      // Start from beginning if repeat all is enabled
+      const firstSong = queue[0];
+      const socket = useChatStore.getState().socket;
+      if (socket.auth) {
+        socket.emit("update_activity", {
+          userId: socket.auth.userId,
+          activity: `Playing ${firstSong.title} by ${firstSong.artist}`,
+        });
+      }
+      set({
+        currentSong: firstSong,
+        currentIndex: 0,
+        isPlaying: true,
+      });
     } else {
       // no next song
       set({ isPlaying: false });
@@ -123,9 +163,26 @@ export const usePlayerStore = create<PlayerStore>((set, get) => ({
       }
     }
   },
+
   playPrevious: () => {
-    const { currentIndex, queue } = get();
+    const { currentIndex, queue, repeatMode } = get();
     const prevIndex = currentIndex - 1;
+
+    // Handle repeat modes
+    if (repeatMode === "one") {
+      const currentSong = get().currentSong;
+      if (currentSong) {
+        const socket = useChatStore.getState().socket;
+        if (socket.auth) {
+          socket.emit("update_activity", {
+            userId: socket.auth.userId,
+            activity: `Playing ${currentSong.title} by ${currentSong.artist}`,
+          });
+        }
+        set({ isPlaying: true });
+        return;
+      }
+    }
 
     // theres a prev song
     if (prevIndex >= 0) {
@@ -144,6 +201,21 @@ export const usePlayerStore = create<PlayerStore>((set, get) => ({
         currentIndex: prevIndex,
         isPlaying: true,
       });
+    } else if (repeatMode === "all") {
+      // Go to last song if repeat all is enabled
+      const lastSong = queue[queue.length - 1];
+      const socket = useChatStore.getState().socket;
+      if (socket.auth) {
+        socket.emit("update_activity", {
+          userId: socket.auth.userId,
+          activity: `Playing ${lastSong.title} by ${lastSong.artist}`,
+        });
+      }
+      set({
+        currentSong: lastSong,
+        currentIndex: queue.length - 1,
+        isPlaying: true,
+      });
     } else {
       // no prev song
       set({ isPlaying: false });
@@ -156,5 +228,38 @@ export const usePlayerStore = create<PlayerStore>((set, get) => ({
         });
       }
     }
+  },
+
+  setVolume: (volume: number) => {
+    set({ volume: Math.max(0, Math.min(1, volume)) });
+  },
+
+  toggleShuffle: () => {
+    const { isShuffled, queue } = get();
+    if (!isShuffled) {
+      // Shuffle the queue
+      const shuffledQueue = [...queue];
+      for (let i = shuffledQueue.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffledQueue[i], shuffledQueue[j]] = [
+          shuffledQueue[j],
+          shuffledQueue[i],
+        ];
+      }
+      set({ queue: shuffledQueue, isShuffled: true });
+    } else {
+      // Restore original order
+      const originalQueue = [...queue].sort((a, b) =>
+        a._id.localeCompare(b._id)
+      );
+      set({ queue: originalQueue, isShuffled: false });
+    }
+  },
+
+  toggleRepeat: () => {
+    const { repeatMode } = get();
+    const nextMode =
+      repeatMode === "none" ? "all" : repeatMode === "all" ? "one" : "none";
+    set({ repeatMode: nextMode });
   },
 }));
