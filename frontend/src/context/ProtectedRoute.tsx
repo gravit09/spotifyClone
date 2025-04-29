@@ -1,19 +1,18 @@
-import React, { ReactNode } from "react";
 import { Navigate, Outlet } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "@clerk/clerk-react";
 
 interface ProtectedRouteProps {
   redirectPath?: string;
-  children?: ReactNode;
+  children?: React.ReactNode;
 }
 
-const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
-  redirectPath = "/",
+const ProtectedRoute = ({
+  redirectPath = "/login",
   children,
-}) => {
-  const { isAuthenticated } = useAuth();
+}: ProtectedRouteProps) => {
+  const { isSignedIn } = useAuth();
 
-  if (!isAuthenticated) {
+  if (!isSignedIn) {
     return <Navigate to={redirectPath} replace />;
   }
 

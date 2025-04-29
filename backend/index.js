@@ -5,6 +5,8 @@ import connectDb from "./db/index.js";
 import fileUpload from "express-fileupload";
 import path from "path";
 import { fileURLToPath } from "url"; // Imported this because __dirname is only available on commonjs
+import { createServer } from "http";
+import { initializeSocket } from "./socket/socketManager.js";
 
 const __filename = fileURLToPath(import.meta.url); // Current file's path
 const __dirname = path.dirname(__filename); // Directory name of the current file
@@ -41,8 +43,11 @@ app.get("/", (req, res) => {
 
 connectDb()
   .then(() => {
-    app.listen(3000, () => {
-      console.log("application is running on port 3000");
+    const server = createServer(app);
+    initializeSocket(server);
+
+    server.listen(3000, () => {
+      console.log("Server is running on port 3000");
     });
   })
   .catch((err) => {

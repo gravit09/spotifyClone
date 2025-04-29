@@ -2,6 +2,7 @@ import { axiosInstance } from "@/lib/axios";
 import { Album, Song, Stats } from "@/types";
 import toast from "react-hot-toast";
 import { create } from "zustand";
+import { useSocketStore } from "./useSocketStore";
 
 interface MusicStore {
   songs: Song[];
@@ -13,6 +14,7 @@ interface MusicStore {
   madeForYouSongs: Song[];
   trendingSongs: Song[];
   stats: Stats;
+  currentSong: Song | null;
 
   fetchAlbums: () => Promise<void>;
   fetchAlbumById: (id: string) => Promise<void>;
@@ -23,9 +25,10 @@ interface MusicStore {
   fetchSongs: () => Promise<void>;
   deleteSong: (id: string) => Promise<void>;
   deleteAlbum: (id: string) => Promise<void>;
+  setCurrentSong: (song: Song | null) => void;
 }
 
-export const useMusicStore = create<MusicStore>((set) => ({
+export const useMusicStore = create<MusicStore>((set, get) => ({
   albums: [],
   songs: [],
   isLoading: false,
@@ -40,12 +43,12 @@ export const useMusicStore = create<MusicStore>((set) => ({
     totalUsers: 0,
     totalArtists: 0,
   },
+  currentSong: null,
 
   deleteSong: async (id) => {
     set({ isLoading: true, error: null });
     try {
       await axiosInstance.delete(`/admin/songs/${id}`);
-
       set((state) => ({
         songs: state.songs.filter((song) => song._id !== id),
       }));
@@ -82,7 +85,6 @@ export const useMusicStore = create<MusicStore>((set) => ({
     set({ isLoading: true, error: null });
     try {
       const response = await axiosInstance.get("/songs");
-      console.log(response);
       set({ songs: response.data });
     } catch (error: any) {
       set({ error: error.message });
@@ -106,12 +108,7 @@ export const useMusicStore = create<MusicStore>((set) => ({
   fetchAlbums: async () => {
     set({ isLoading: true, error: null });
     try {
-      const token = localStorage.getItem("token");
-      const response = await axiosInstance.get("/albums", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await axiosInstance.get("/albums");
       set({ albums: response.data.allAlbums });
     } catch (error: any) {
       set({ error: error.response.data.message });
@@ -165,6 +162,20 @@ export const useMusicStore = create<MusicStore>((set) => ({
       set({ error: error.response.data.message });
     } finally {
       set({ isLoading: false });
+    }
+  },
+
+  setCurrentSong: (song) => {
+    set({ currentSong: song });
+    const { updateCurrentSong } = useSocketStore.getState();
+    if (song) {
+      updateCurrentSong({
+        title: song.title,
+        artist: song.artist,
+        albumArt: song.imageUrl,
+      });
+    } else {
+      updateCurrentSong(null);
     }
   },
 }));

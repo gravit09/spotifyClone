@@ -1,8 +1,10 @@
-import { useAuth } from "@/context/AuthContext";
+import { useAuth, SignOutButton, useUser } from "@clerk/clerk-react";
 import { useNavigate, Link } from "react-router-dom";
+
 export default function Topbar() {
   const navigate = useNavigate();
-  const { isAuthenticated, role, logout } = useAuth();
+  const { isSignedIn } = useAuth();
+  const { user } = useUser();
 
   return (
     <header className="flex items-center justify-between px-6 py-4 bg-gray-900 text-white">
@@ -17,19 +19,18 @@ export default function Topbar() {
         <a href="#" className="text-sm hover:text-green-500">
           Your Library
         </a>
-        {role && (
+        {user?.publicMetadata?.role === "admin" && (
           <Link to="/dashboard" className="text-sm hover:text-green-500">
             Dashboard
           </Link>
         )}
       </nav>
-      {isAuthenticated ? (
-        <button
-          onClick={() => logout()}
-          className="py-2 px-4 bg-green-500 text-sm rounded-full hover:bg-green-400"
-        >
-          Logout
-        </button>
+      {isSignedIn ? (
+        <SignOutButton>
+          <button className="py-2 px-4 bg-green-500 text-sm rounded-full hover:bg-green-400">
+            Logout
+          </button>
+        </SignOutButton>
       ) : (
         <button
           onClick={() => navigate("/login")}
